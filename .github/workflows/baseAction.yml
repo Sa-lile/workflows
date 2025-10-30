@@ -7,9 +7,6 @@ on:
       environment:
         type: choice
         options:
-          - information
-          - warning
-          - debug
           - Develop
           - Preproduction
           - production
@@ -47,44 +44,24 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          # Ajuster le chemin du lockfile si le projet est dans un sous-dossier
           cache-dependency-path: 'package-lock.json'
 
       - name: Install modules
         id: installModules
         shell: bash
         run: |
-          if [ ! -f package.json ]; then
-            echo "No package.json found, skipping npm install"
-          else
-            if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ] || [ -f yarn.lock ]; then
-              echo "Lockfile found — using npm ci"
-              npm ci --prefer-offline --no-audit --progress=false
-            else
-              echo "No lockfile found — using npm install (will create package-lock.json)"
-              npm install --no-audit --no-fund --prefer-offline --progress=false
-            fi
-          fi
+          npm install
 
       - name: Build project
         id: buildProject
         shell: bash
         run: |
-          set -euxo pipefail
-          echo "Working dir: $(pwd)"
-          ls -la
-          mkdir -p dist
-          if [ -f Makefile ]; then
-            echo "---- Makefile ----"
-            sed -n '1,200p' Makefile || true
-            echo "---- Run make build ----"
-            make build
-          elif [ -f package.json ] && npm run | grep -q "build"; then
-            echo "---- Run npm build ----"
-            npm run build
-          else
-            echo "No build step found. Skipping build."
-          fi
+          make build
+      
+      - name: add-build-to-sumary
+        shell: bash
+        run: echo "build : terminé ">> "${GITHUB_STEP_SUMMARY:-/dev/null}"
+
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -92,7 +69,9 @@ jobs:
           name: project-build
           path: dist/
 
-  download:
+      
+
+  Download:
     name: Download build artifact
     runs-on: ubuntu-latest
     needs: build
@@ -103,3 +82,22 @@ jobs:
         with:
           name: project-build
           path: downloaded_build/
+
+      - name: "check"
+        run: cd dist && ls -l
+
+      - name: varibale-output
+        id: var-output
+        run: echo "::set-output name-testvar::coucou" 
+
+      - name: variable-two-output
+        id: variable-two-output
+        run: echo "testvartwo=wurevoir" >> $GITHUB_OUTPUT
+      
+      - name: step-sontent
+        run: echo ${{ step.variable-output }}
+
+      - name: varibale-two-print
+        run: echo "${{ steps.variable-two-output.outputs.twotestvar }}"
+        
+      

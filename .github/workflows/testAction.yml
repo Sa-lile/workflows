@@ -1,0 +1,37 @@
+name: Unit Tests
+
+on:
+    pull_request:
+    push:               
+    workflow_dispatch:
+
+jobs:
+
+    unit-tests:
+        name: Unit Tests
+        runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            node-version: [14, 16, 20, 22]
+
+        steps:
+            - name: Checkout 
+              uses: actions/checkout@v5
+              with:
+                  ref: ${{ github.sha }}
+
+            - name: SetupNode 
+              uses: actions/setup-node@v6
+              with:
+                    node-version: ${{ matrix.node-version }}
+
+                    
+            - name: Install modules
+              id: installModules
+              shell: bash
+              run: 
+                npm install
+
+            - name: execute tests
+              id: executeTests
+              run: npm run test

@@ -1,0 +1,20 @@
+{
+  "name": "wrokflow",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sa-lile/workflows.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sa-lile/workflows/issues"
+  },
+  "homepage": "https://github.com/Sa-lile/workflows#readme",
+  "description": ""
+}
