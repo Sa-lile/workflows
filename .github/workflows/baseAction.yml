@@ -62,15 +62,36 @@ jobs:
             echo "No package.json found, skipping npm install"
           fi
 
-      - name: Build project
+      - name: Build project (with debug)
         id: buildProject
         shell: bash
         run: |
-          if [ -f package.json ] && npm run | grep -q "build"; then
+          set -euxo pipefail
+          echo "Working dir: $(pwd)"
+          ls -la
+          if [ -f Makefile ]; then
+            echo "---- Makefile ----"
+            sed -n '1,200p' Makefile || true
+            echo "---- Run make build ----"
+            make build || { echo "Make failed with exit code $?"; exit 1; }
+          elif [ -f  ] && npm run | grep -q "build"; then
             npm run build
-          elif [ -f Makefile ]; then
-            make build
           else
             echo "No build step found. Skipping build."
           fi
 
+      - name: upload artfact
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-build
+          path: dist/
+    
+  Download: 
+      name: Download build artifact
+      runs-on: ubuntu-latest  
+      
+      steps:
+        - name: Download artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: project-build
