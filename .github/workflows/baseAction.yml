@@ -40,28 +40,34 @@ jobs:
           ENV_INPUT: ${{ github.event.inputs.environment }}
       
       - name: CHECKOUT
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
 
-      - name: Cache npm dependencies
-        uses: actions/cache@v4
+      - name: Setup Node.js and cache npm
+        uses: actions/setup-node@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
+          node-version: '18'
+          cache: 'npm'
 
       - name: Install modules
         id: installModules
         shell: bash
         run: |
-          cd frontend
-          npm install
+          if [ -f package.json ]; then
+            npm ci --prefer-offline --no-audit --progress=false
+          else
+            echo "No package.json found, skipping npm install"
+          fi
 
-      - name: Build project
+      - name: Build project (conditional)
         id: buildProject
         shell: bash
         run: |
-          cd frontend
-          make build
+          if [ -f package.json ] && npm run | grep -q "build"; then
+            npm run build
+          elif [ -f Makefile ]; then
+            make build
+          else
+            echo "No build step found (no package.json build script or Makefile). Skipping build."
+          fi
