@@ -1,0 +1,25 @@
+name: action-base
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  gitHubInfos:
+    name: Get GitHub Info
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set GitHub Info
+        id: github_info
+        shell: bash
+        run: |
+          echo ${GITHUB_CONTEXT}
+
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+
+
+    
+
+

@@ -3,14 +3,25 @@ name: action-base
 on:
   push:
   workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options:
+          - Develop
+          - Preproduction
+          - production
+
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
 
 jobs:
   gitHubInfos:
     name: Get GitHub Info
     runs-on: ubuntu-latest
     steps:
-      - name: Set GitHub Info
-        id: github_info
+      - name: Set GitHub details
+        id: gidetails
         shell: bash
         run: |
           echo ${GITHUB_CONTEXT}
@@ -18,7 +29,38 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
+      - name: Get env selection
+        id: envSelecion
+        shell: bash
+        run: |
+          echo ${EBV_INPUT}
+        env:
+          EBV_INPUT: ${{ github.event.inputs.environment }}
+      
+      - name: CHECKOUT
+        uses: actions/checkout@v5      #https://github.com/actions/checkout
+        with:
+          ref: ${{ github.sha }}  
+      
+      - name: install moudles
+        id: installModules
+        shell: bash
+        run: |
+          npm i
+      
+      - name: cache deps
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: 
+            ${{ runner.os }}-npm-1
 
+      - name: build project
+        id: buildProject
+        shell: bash
+        run: |
+          make build
 
     
 
