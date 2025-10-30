@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set GitHub details
         id: gidetails
@@ -47,8 +47,10 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          # Ajuster le chemin du lockfile si le projet est dans un sous-dossier
+          cache-dependency-path: 'package-lock.json'
 
-      - name: Install modules (skip if no package.json)
+      - name: Install modules
         id: installModules
         shell: bash
         run: |
