@@ -13,7 +13,6 @@ on:
           - Develop
           - Preproduction
           - production
-
         description: 'Environment to deploy to'
         required: true
         default: 'production'
@@ -22,37 +21,30 @@ jobs:
   gitHubInfos:
     name: Get GitHub Info
     runs-on: ubuntu-latest
+
     steps:
       - name: Set GitHub details
         id: gidetails
         shell: bash
         run: |
-          echo ${GITHUB_CONTEXT}
-
+          echo "${GITHUB_CONTEXT}"
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: Get env selection
-        id: envSelecion
+        id: envSelection
         shell: bash
         run: |
-          echo ${ENV_INPUT}
+          echo "Selected environment: ${ENV_INPUT}"
         env:
           ENV_INPUT: ${{ github.event.inputs.environment }}
-
       
       - name: CHECKOUT
-        uses: actions/checkout@v5      #https://github.com/actions/checkout
+        uses: actions/checkout@v5
         with:
-          ref: ${{ github.sha }}  
-      
-      - name: install moudles
-        id: installModules
-        shell: bash
-        run: |
-          npm i
-      
-      - name: cache deps
+          ref: ${{ github.sha }}
+
+      - name: Cache npm dependencies
         uses: actions/cache@v4
         with:
           path: ~/.npm
@@ -60,12 +52,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
-      - name: build project
+      - name: Install modules
+        id: installModules
+        shell: bash
+        run: |
+          npm ci
+
+      - name: Build project
         id: buildProject
         shell: bash
         run: |
           make build
-
-    
-
-
