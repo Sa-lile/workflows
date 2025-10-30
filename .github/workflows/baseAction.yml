@@ -59,8 +59,7 @@ jobs:
           make build
       
       - name: add-build-to-sumary
-        shell: bash
-        run: echo "build : terminé ">> "${GITHUB_STEP_SUMMARY:-/dev/null}"
+        run: echo "✅ Build terminé" >> $GITHUB_STEP_SUMMARY
 
 
       - name: Upload artifact
@@ -95,7 +94,7 @@ jobs:
         run: echo "testvartwo=wurevoir" >> $GITHUB_OUTPUT
       
       - name: step-sontent
-        run: echo ${{ step.variable-output }}
+        run: echo ${{ steps.var-output.outputs.name-testvar }}
 
       - name: varibale-two-print
         run: echo "${{ steps.variable-two-output.outputs.twotestvar }}"

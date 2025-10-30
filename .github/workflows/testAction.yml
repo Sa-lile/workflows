@@ -12,7 +12,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
           matrix:
-            node-version: [14, 20, 22]
+            node-version: [14, 16, 20, 22]
 
         steps:
             - name: Checkout 
@@ -23,7 +23,7 @@ jobs:
             - name: SetupNode 
               uses: actions/setup-node@v6
               with:
-                    node-version: ${{ matrix.node-version }}
+                   node-version: ${{ matrix.node-version }}
 
 
             - name: Install modules
