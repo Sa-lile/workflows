@@ -56,7 +56,7 @@ jobs:
         id: installModules
         shell: bash
         run: |
-          npm ci
+          npm i
 
       - name: Build project
         id: buildProject
