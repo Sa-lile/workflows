@@ -84,16 +84,16 @@ jobs:
       - name: "check"
         run: cd downloaded_build && ls -l
 
-      - name: varibale-output
+      - name: Variable output
         id: var-output
-        run: echo "::set-output name-testvar::coucou" 
+        run: echo "testvar=coucou" >> $GITHUB_OUTPUT
 
       - name: variable-two-output
         id: variable-two-output
         run: echo "testvartwo=wurevoir" >> $GITHUB_OUTPUT
       
-      - name: step-sontent
-        run: echo ${{ steps.var-output.outputs.name-testvar }}
+      - name: Step content
+        run: echo "Variable 1 = ${{ steps.var-output.outputs.testvar }}"
 
       - name: varibale-two-print
         run: echo "${{ steps.variable-two-output.outputs.twotestvar }}"
