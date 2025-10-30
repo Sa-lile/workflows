@@ -56,10 +56,12 @@ jobs:
         id: installModules
         shell: bash
         run: |
-          npm ci
+          cd frontend
+          npm install
 
       - name: Build project
         id: buildProject
         shell: bash
         run: |
+          cd frontend
           make build
