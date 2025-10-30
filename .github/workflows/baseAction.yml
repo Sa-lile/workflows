@@ -1,3 +1,4 @@
+
 name: action-base
 
 on:
@@ -18,8 +19,8 @@ on:
         default: 'production'
 
 jobs:
-  gitHubInfos:
-    name: Get GitHub Info
+  Build:
+    name: Build
     runs-on: ubuntu-latest
 
     steps:
@@ -38,21 +39,19 @@ jobs:
           echo "Selected environment: ${ENV_INPUT}"
         env:
           ENV_INPUT: ${{ github.event.inputs.environment }}
-      
+
       - name: CHECKOUT
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
 
-      - name: Cache npm dependencies
-        uses: actions/cache@v4
+      - name: Setup Node.js and cache npm (optional)
+        uses: actions/setup-node@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
+          node-version: '18'
+          cache: 'npm'
 
-      - name: Install modules
+      - name: Install modules (skip if no package.json)
         id: installModules
         shell: bash
         run: |
@@ -73,25 +72,29 @@ jobs:
             echo "---- Makefile ----"
             sed -n '1,200p' Makefile || true
             echo "---- Run make build ----"
-            make build || { echo "Make failed with exit code $?"; exit 1; }
-          elif [ -f  ] && npm run | grep -q "build"; then
+            make build
+          elif [ -f package.json ] && npm run | grep -q "build"; then
+            echo "---- Run npm build ----"
             npm run build
           else
             echo "No build step found. Skipping build."
           fi
+          mkdir -p dist
 
-      - name: upload artfact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: project-build
           path: dist/
-    
-  Download: 
-      name: Download build artifact
-      runs-on: ubuntu-latest  
-      
-      steps:
-        - name: Download artifact
-          uses: actions/download-artifact@v4
-          with:
-            name: project-build
+
+  Download:
+    name: Download build artifact
+    runs-on: ubuntu-latest
+    needs: Build
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: project-build
+          path: downloaded_build/
