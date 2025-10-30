@@ -1,4 +1,3 @@
-
 name: action-base
 
 on:
@@ -19,11 +18,14 @@ on:
         default: 'production'
 
 jobs:
-  Build:
+  build:
     name: Build
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
       - name: Set GitHub details
         id: gidetails
         shell: bash
@@ -32,7 +34,7 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
-      - name: Get env selection
+      - name: Get environment selection
         id: envSelection
         shell: bash
         run: |
@@ -40,12 +42,7 @@ jobs:
         env:
           ENV_INPUT: ${{ github.event.inputs.environment }}
 
-      - name: CHECKOUT
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.sha }}
-
-      - name: Setup Node.js and cache npm (optional)
+      - name: Setup Node.js and cache npm
         uses: actions/setup-node@v4
         with:
           node-version: '18'
@@ -61,13 +58,14 @@ jobs:
             echo "No package.json found, skipping npm install"
           fi
 
-      - name: Build project (with debug)
+      - name: Build project
         id: buildProject
         shell: bash
         run: |
           set -euxo pipefail
           echo "Working dir: $(pwd)"
           ls -la
+          mkdir -p dist
           if [ -f Makefile ]; then
             echo "---- Makefile ----"
             sed -n '1,200p' Makefile || true
@@ -79,7 +77,6 @@ jobs:
           else
             echo "No build step found. Skipping build."
           fi
-          mkdir -p dist
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -87,10 +84,10 @@ jobs:
           name: project-build
           path: dist/
 
-  Download:
+  download:
     name: Download build artifact
     runs-on: ubuntu-latest
-    needs: Build
+    needs: build  # doit référencer le nom du job "build"
 
     steps:
       - name: Download artifact
