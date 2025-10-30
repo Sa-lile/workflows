@@ -40,4 +40,4 @@ jobs:
 
       - name: execute tests
         id: execute_tests
-        run: npm run test
+        run: npm run test --if-present
