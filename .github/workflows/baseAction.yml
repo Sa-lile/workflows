@@ -82,7 +82,7 @@ jobs:
           path: downloaded_build/
 
       - name: "check"
-        run: cd dist && ls -l
+        run: cd downloaded_build && ls -l
 
       - name: varibale-output
         id: var-output
