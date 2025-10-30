@@ -36,9 +36,10 @@ jobs:
         id: envSelecion
         shell: bash
         run: |
-          echo ${EBV_INPUT}
+          echo ${ENV_INPUT}
         env:
-          EBV_INPUT: ${{ github.event.inputs.environment }}
+          ENV_INPUT: ${{ github.event.inputs.environment }}
+
       
       - name: CHECKOUT
         uses: actions/checkout@v5      #https://github.com/actions/checkout
