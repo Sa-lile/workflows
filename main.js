@@ -8,5 +8,6 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
-  throw new Error('stop'); 
+  throw new Error('au revoir');
+  // throw new Error('stop'); 
 });
